@@ -118,12 +118,12 @@ class Seq2SeqModel(object):
       softmax_loss_function = sampled_loss
 
     # Create the internal multi-layer cell for our RNN.
-    single_cell = tf.contrib.rnn.core_rnn_cell.GRUCell(size)
+    single_cell = tf.contrib.rnn.GRUCell(size)
     if use_lstm:
-      single_cell = tf.contrib.rnn.core_rnn_cell.BasicLSTMCell(size)
+      single_cell = tf.contrib.rnn.BasicLSTMCell(size)
     cell = single_cell
     if num_layers > 1:
-      cell = tf.contrib.rnn.core_rnn_cell.MultiRNNCell([single_cell] *
+      cell = tf.contrib.rnn.MultiRNNCell([single_cell] *
                                                        num_layers)
 
     # The seq2seq function: we use embedding for the input and attention.
@@ -131,7 +131,7 @@ class Seq2SeqModel(object):
       return tf.contrib.legacy_seq2seq.embedding_attention_seq2seq(
           encoder_inputs,
           decoder_inputs,
-          cell,
+          copy.deepcopy(cell),
           num_encoder_symbols=source_vocab_size,
           num_decoder_symbols=target_vocab_size,
           embedding_size=size,
